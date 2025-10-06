@@ -1220,6 +1220,12 @@
         "isAdult": false
       },
       {
+        "name": "Kabuki",
+        "description": "Centers around the traditional Japanese form of theater known as Kabuki.",
+        "category": "Theme-Arts",
+        "isAdult": false
+      },
+      {
         "name": "Kaiju",
         "description": "Prominently features giant monsters.",
         "category": "Theme-Fantasy",

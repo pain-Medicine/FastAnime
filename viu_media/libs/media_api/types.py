@@ -539,6 +539,7 @@ class MediaTag(Enum):
     DRAWING = "Drawing"
     FASHION = "Fashion"
     FOOD = "Food"
+    KABUKI = "Kabuki"
     MAKEUP = "Makeup"
     PHOTOGRAPHY = "Photography"
     RAKUGO = "Rakugo"

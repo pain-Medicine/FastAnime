@@ -1,6 +1,6 @@
 import re
 
-ANIMEPAHE = "animepahe.ru"
+ANIMEPAHE = "animepahe.si"
 ANIMEPAHE_BASE = f"https://{ANIMEPAHE}"
 ANIMEPAHE_ENDPOINT = f"{ANIMEPAHE_BASE}/api"
 
@@ -25,7 +25,7 @@ SERVER_HEADERS = {
     "Accept-Encoding": "Utf-8",
     "DNT": "1",
     "Connection": "keep-alive",
-    "Referer": "https://animepahe.ru/",
+    "Referer": "https://animepahe.si/",
     "Upgrade-Insecure-Requests": "1",
     "Sec-Fetch-Dest": "iframe",
     "Sec-Fetch-Mode": "navigate",
