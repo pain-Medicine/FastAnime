@@ -82,19 +82,28 @@ For the best experience, please install these external tools:
     *   [**webtorrent-cli**](https://github.com/webtorrent/webtorrent-cli) - For streaming torrents directly.
 
 ### Recommended Installation (uv)
-
 The best way to install Viu is with [**uv**](https://github.com/astral-sh/uv), a lightning-fast Python package manager.
 
-```bash
-# Install with all optional features for the full experience
-# Clone the repository and from the base directory run: 
-uv tool install .
+<details>
+  <summary><b>Building from Source</b></summary>
+  
+  Requires [Git](https://git-scm.com/), [Python 3.10+](https://www.python.org/), and [uv](https://astral.sh/blog/uv).
+  ```bash
+  git clone https://github.com/viu-media/Viu.git --depth 1
+  cd Viu
+  uv tool install .
+  viu --version
+  ```
+</details>
 
+
+
+```bash
 # Or, if you are already have VIU installed:
 uv tool install . --reinstall
 ```
 
-### Other Installation Methods
+### Other Installation Methods - UNTESTED
 
 <details>
   <summary><b>Platform-Specific and Alternative Installers</b></summary>
@@ -213,17 +222,7 @@ https://github.com/user-attachments/assets/0c628421-a439-4dea-91bb-7153e8f20ccf
   ```
 </details>
 
-<details>
-  <summary><b>Building from Source</b></summary>
-  
-  Requires [Git](https://git-scm.com/), [Python 3.10+](https://www.python.org/), and [uv](https://astral.sh/blog/uv).
-  ```bash
-  git clone https://github.com/viu-media/Viu.git --depth 1
-  cd Viu
-  uv tool install .
-  viu --version
-  ```
-</details>
+
 
 > [!TIP]
 > Enable shell completions for a much better experience by running `viu completions` and following the on-screen instructions for your shell.
