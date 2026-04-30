@@ -12,7 +12,7 @@ SERVERS_AVAILABLE = [
     "mp4-upload",
 ]
 API_BASE_URL = "allanime.day"
-API_GRAPHQL_REFERER = "https://allmanga.to/"
+API_GRAPHQL_REFERER = "https://youtu-chan.com"
 API_GRAPHQL_ENDPOINT = f"https://api.{API_BASE_URL}/api/"
 AES_KEY_PASSPHRASE = "Xot36i3lK3:v1"
 

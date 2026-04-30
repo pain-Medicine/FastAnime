@@ -24,11 +24,17 @@ logger = logging.getLogger(__name__)
 class AllAnime(BaseAnimeProvider):
     HEADERS = {"Referer": API_GRAPHQL_REFERER}
 
+    def __init__(self, client):
+        super().__init__(client)
+        # Use curl_cffi to bypass Cloudflare TLS fingerprinting on AllAnime
+        from curl_cffi import requests
+        self.curl_client = requests.Session(impersonate="chrome", headers=self.HEADERS)
+
     @debug_provider
     def search(self, params):
         response = execute_graphql(
             API_GRAPHQL_ENDPOINT,
-            self.client,
+            self.curl_client,
             SEARCH_GQL,
             variables={
                 "search": {
@@ -48,7 +54,7 @@ class AllAnime(BaseAnimeProvider):
     def get(self, params):
         response = execute_graphql(
             API_GRAPHQL_ENDPOINT,
-            self.client,
+            self.curl_client,
             ANIME_GQL,
             variables={"showId": params.id},
         )
@@ -61,7 +67,7 @@ class AllAnime(BaseAnimeProvider):
 
         episode_response = execute_graphql(
             API_GRAPHQL_ENDPOINT,
-            self.client,
+            self.curl_client,
             EPISODE_GQL,
             variables={
                 "showId": params.anime_id,
@@ -70,8 +76,13 @@ class AllAnime(BaseAnimeProvider):
             },
         )
         try:
-            print("GraphQL Response text:", episode_response.text)
-            episode = episode_response.json()["data"]["episode"]
+            data = episode_response.json().get("data", {})
+            if "episode" in data and data["episode"]:
+                episode = data["episode"]
+            elif "tobeparsed" in data:
+                episode = data
+            else:
+                raise KeyError("episode or tobeparsed not found in data")
         except KeyError:
             print("GraphQL Error response:", episode_response.text)
             raise
@@ -81,7 +92,12 @@ class AllAnime(BaseAnimeProvider):
             return
 
         if "tobeparsed" in episode:
-            source_urls = decrypt_tobeparsed(episode["tobeparsed"])
+            decrypted = decrypt_tobeparsed(episode["tobeparsed"])
+            if "episode" in decrypted and "sourceUrls" in decrypted["episode"]:
+                episode = decrypted["episode"]
+                source_urls = episode["sourceUrls"]
+            else:
+                source_urls = decrypted.get("sourceUrls", [])
         else:
             source_urls = episode.get("sourceUrls", [])
 

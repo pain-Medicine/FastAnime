@@ -8,6 +8,7 @@ requires-python = ">=3.11"
 dependencies = [
   "click>=8.1.7",
   "cryptography>=42.0.0",
+  "curl-cffi>=0.7.0",
   "httpx>=0.28.1",
   "inquirerpy>=0.3.4",
   "pydantic>=2.11.7",
