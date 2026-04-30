@@ -55,7 +55,7 @@ class MPVIPCClient:
         self._response_dict: Dict[int, Any] = {}
         self._response_events: Dict[int, threading.Event] = {}
 
-    def connect(self, timeout: float = 5.0) -> None:
+    def connect(self, timeout: float = 10.0) -> None:
         """Connect to MPV IPC socket and start the reader thread."""
         start_time = time.time()
         while time.time() - start_time < timeout:
@@ -329,10 +329,15 @@ class MpvIPCPlayer(BaseIPCPlayer):
 
     def _start_mpv_process(self, player: BasePlayer, params: PlayerParams) -> None:
         """Start MPV process with IPC enabled."""
-        temp_dir = Path(tempfile.gettempdir())
-        self.socket_path = str(temp_dir / f"mpv_ipc_{time.time()}.sock")
+        # Use a shorter socket path to avoid length limits on some systems
+        import os
+        socket_name = f"mpv_{int(time.time())}.sock"
+        self.socket_path = os.path.join(tempfile.gettempdir(), socket_name)
+        
         self.mpv_process = player.play_with_ipc(params, self.socket_path)
-        time.sleep(1.0)
+        # Give MPV more time to initialize the IPC server on slower ARM boards
+        time.sleep(2.0)
+
 
     def _connect_ipc(self):
         if not self.socket_path:
