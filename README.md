@@ -93,15 +93,11 @@ The best way to install Viu is with [**uv**](https://github.com/astral-sh/uv), a
   cd Viu
   uv tool install .
   viu --version
+
+  # Or, if you are already have VIU installed:
+  uv tool install . --reinstall
   ```
 </details>
-
-
-
-```bash
-# Or, if you are already have VIU installed:
-uv tool install . --reinstall
-```
 
 ### Other Installation Methods - UNTESTED
 
