@@ -10,10 +10,10 @@
 
 [![PyPI - Version](https://img.shields.io/pypi/v/viu-media)](https://pypi.org/project/viu-media/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/viu-media)](https://pypi.org/project/viu-media/)
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Benexl/Viu/test.yml?label=Tests)](https://github.com/Benexl/Viu/actions)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/viu-media/Viu/test.yml?label=Tests)](https://github.com/viu-media/Viu/actions)
 [![Discord](https://img.shields.io/discord/1250887070906323096?label=Discord&logo=discord)](https://discord.gg/HBEmAwvbHV)
-[![GitHub Issues](https://img.shields.io/github/issues/Benexl/Viu)](https://github.com/Benexl/Viu/issues)
-[![PyPI - License](https://img.shields.io/pypi/l/viu)](https://github.com/Benexl/Viu/blob/master/LICENSE)
+[![GitHub Issues](https://img.shields.io/github/issues/viu-media/Viu)](https://github.com/viu-media/Viu/issues)
+[![PyPI - License](https://img.shields.io/pypi/l/viu)](https://github.com/viu-media/Viu/blob/master/LICENSE)
 
 </div>
 
@@ -23,6 +23,36 @@
   </a>
 </p>
 
+[viu-showcase.webm](https://github.com/user-attachments/assets/5da0ec87-7780-4310-9ca2-33fae7cadd5f)
+
+<details>
+<summary>Rofi</summary>
+  
+  [viu-showcase-rofi.webm](https://github.com/user-attachments/assets/01f197d9-5ac9-45e6-a00b-8e8cd5ab459c)
+
+</details>
+
+<details>
+  <summary>RICED</summary>
+  
+  *main menu*
+  
+  <img width="1895" height="1007" alt="image" src="https://github.com/user-attachments/assets/e6d8883f-0267-4783-9688-983dea524e78" />
+  
+  *anime preview menu*
+  
+  <img width="1895" height="1007" alt="image" src="https://github.com/user-attachments/assets/3b887bcc-a601-4c04-b477-8328f50c227d" />
+
+  *episode menu*
+
+  <img width="1895" height="1007" alt="image" src="https://github.com/user-attachments/assets/f6284c55-a1a9-4720-83a0-efca0a767c85" />
+
+</details>
+
+> [!IMPORTANT]
+> This project scrapes public-facing websites for its streaming / downloading capabilities and primarily acts as an anilist, jikan and many other media apis tui client. The developer(s) of this application have no affiliation with these content providers. This application hosts zero content and is intended for educational and personal use only. Use at your own risk.
+> 
+> [**Read the Full Disclaimer**](DISCLAIMER.md)
 
 ## Core Features
 
@@ -36,7 +66,7 @@
 
 ## Installation
 
-Viu runs on any platform with Python 3.10+, including Windows, macOS, Linux, and Android (via Termux).
+Viu runs on Windows, macOS, Linux, and Android (via Termux). Pre-built binaries are available for quick installation without Python, or you can install via Python 3.10+ package managers.
 
 ### Prerequisites
 
@@ -50,6 +80,39 @@ For the best experience, please install these external tools:
 *   **Recommended for Downloads & Advanced Features:**
     *   [**ffmpeg**](https://www.ffmpeg.org/) - Required for downloading HLS streams and merging subtitles.
     *   [**webtorrent-cli**](https://github.com/webtorrent/webtorrent-cli) - For streaming torrents directly.
+
+### Pre-built Binaries (Recommended for Quick Start)
+
+The easiest way to get started is to download a pre-built, self-contained binary from the [**releases page**](https://github.com/viu-media/viu/releases/latest). These binaries include all dependencies and **do not require Python** to be installed.
+
+**Available for:**
+*   **Linux** (x86_64): `viu-linux-x86_64`
+*   **Windows** (x86_64): `viu-windows-x86_64.exe`
+*   **macOS** (Intel x86_64): `viu-macos-x86_64`
+*   **macOS** (Apple Silicon ARM64): `viu-macos-arm64`
+
+**Installation Steps:**
+1.  Download the appropriate binary for your platform from the [**releases page**](https://github.com/viu-media/viu/releases/latest).
+2.  **Linux/macOS:** Make it executable:
+    ```bash
+    # Replace with the actual binary name you downloaded
+    chmod +x viu-linux-x86_64
+    ```
+    Then move it to a directory in your PATH:
+    ```bash
+    # Option 1: System-wide installation (requires sudo)
+    sudo mv viu-linux-x86_64 /usr/local/bin/viu
+    
+    # Option 2: User directory installation
+    mkdir -p ~/.local/bin
+    mv viu-linux-x86_64 ~/.local/bin/viu
+    # Make sure ~/.local/bin is in your PATH
+    ```
+    **Windows:** Simply rename `viu-windows-x86_64.exe` to `viu.exe` and place it in a directory in your PATH, or run it directly.
+3.  Verify the installation:
+    ```bash
+    viu --version
+    ```
 
 ### Recommended Installation (uv)
 
@@ -74,16 +137,16 @@ uv tool install "viu-media[notifications]" # For desktop notifications
   #### Nix / NixOS
   ##### Ephemeral / One-Off Run (No Installation)
   ```bash
-  nix run github:Benexl/viu
+  nix run github:viu-media/viu
   ```
   ##### Imperative Installation
   ```bash
-  nix profile install github:Benexl/viu
+  nix profile install github:viu-media/viu
   ```
   ##### Declarative Installation
   ###### in your flake.nix
   ```nix
-  viu.url = "github:Benexl/viu";
+  viu.url = "github:viu-media/viu";
   ```
   ###### in your system or home-manager packages
   ```nix
@@ -99,6 +162,80 @@ uv tool install "viu-media[notifications]" # For desktop notifications
   # Git version (latest commit)
   yay -S viu-media-git
   ```
+  #### Termux
+  You may have to have rust installed see this issue: https://github.com/pydantic/pydantic-core/issues/1012#issuecomment-2511269688.
+  
+  ```bash
+# Recommended (with pip due to more control)
+pkg install python
+pkg install rust # required cause of pydantic
+
+# NOTE: order matters
+
+# get pydantic from the termux user repository
+pip install pydantic --extra-index-url https://termux-user-repository.github.io/pypi/
+
+# the above will take a while if you want to see more output and feel like sth is happening lol
+pip install pydantic --extra-index-url https://termux-user-repository.github.io/pypi/ -v
+
+# now you can install viu
+pip install viu-media
+
+# === optional deps ===
+# if you have reach here awesome lol :)
+
+# yt-dlp for downloading m3u8 and hls streams
+pip install yt-dlp[default,curl-cffi]
+
+# you may also need ffmpeg for processing the videos
+pkg install ffmpeg
+
+# tip if you also want yt functionality
+pip install yt-dlp-ejs
+
+# you require js runtime
+# eg the recommended one
+pkg install deno
+
+# for faster fuzzy search
+pip install thefuzz
+
+# if you want faster scraping, though barely noticeable lol
+pip install lxml --extra-index-url https://termux-user-repository.github.io/pypi/
+
+# if compilation fails you need to have
+pkg install libxml2 libxslt
+
+# == ui setup ==
+pkg install fzf
+
+# then enable fzf in the config
+viu --selector fzf config --update
+
+# if you want previews as well specify preview option
+# though images arent that pretty lol, so you can stick to text over full
+viu --preview text config --update
+
+# if you set preview to full you need a terminal image renderer
+pkg install chafa
+
+# == player setup ==
+# for this you need to strictly install from playstore
+# search for mpv or vlc (recommended, since has nicer ui)
+# the only limitation is currently its not possible to pass headers to the android players
+# through android intents
+# so use servers like sharepoint and wixmp
+# though this is not an issue when it comes to downloading ;)
+# if you have installed using 'pkg' uninstall it
+
+# okey now you are all set, i promise the hussle is worth it lol :)
+# posted a video of it working to motivate you
+# note i recorded it from waydroid which is android for linux sought of like an emulator(bluestacks for example)
+```
+
+
+https://github.com/user-attachments/assets/0c628421-a439-4dea-91bb-7153e8f20ccf
+
 
   #### Using pipx (for isolated environments)
   ```bash
@@ -116,7 +253,7 @@ uv tool install "viu-media[notifications]" # For desktop notifications
   
   Requires [Git](https://git-scm.com/), [Python 3.10+](https://www.python.org/), and [uv](https://astral.sh/blog/uv).
   ```bash
-  git clone https://github.com/Benexl/Viu.git --depth 1
+  git clone https://github.com/viu-media/Viu.git --depth 1
   cd Viu
   uv tool install .
   viu --version
@@ -134,7 +271,7 @@ Get up and running in three simple steps:
     ```bash
     viu anilist auth
     ```
-    This will open your browser. Authorize the app and paste the obtained token back into the terminal.
+    This will open your browser. Authorize the app and paste the obtained token back into the terminal. Alternatively, you can pass the token directly as an argument, or provide a path to a text file containing the token.
 
 2.  **Launch the Interactive TUI:**
     ```bash
@@ -315,14 +452,10 @@ You can run the background worker as a systemd service for persistence.
     systemctl --user daemon-reload
     systemctl --user enable --now viu-worker.service
     ```
+    
+## Project using it
+**[Inazuma](https://github.com/viu-media/Inazuma)** - official gui wrapper over viu built in kivymd
 
 ## Contributing
 
 Contributions are welcome! Whether it's reporting a bug, proposing a feature, or writing code, your help is appreciated. Please read our [**Contributing Guidelines**](CONTRIBUTIONS.md) to get started.
-
-## Disclaimer
-
-> [!IMPORTANT]
-> This project scrapes public-facing websites. The developer(s) of this application have no affiliation with these content providers. This application hosts zero content and is intended for educational and personal use only. Use at your own risk.
-> 
-> [**Read the Full Disclaimer**](DISCLAIMER.md)

@@ -1,6 +1,6 @@
 [project]
 name = "viu-media"
-version = "3.2.7"
+version = "3.3.7"
 description = "A browser anime site experience from the terminal"
 license = "UNLICENSE"
 readme = "README.md"
@@ -20,45 +20,40 @@ viu = 'viu_media:Cli'
 
 [project.optional-dependencies]
 standard = [
- "thefuzz>=0.22.1",
- "yt-dlp>=2025.7.21",
- "pycryptodomex>=3.23.0",
- "pypiwin32; sys_platform == 'win32'", # For Windows-specific functionality
- "pyobjc; sys_platform == 'darwin'", # For macOS-specific functionality
- "dbus-python; sys_platform == 'linux'", # For Linux-specific functionality (e.g., notifications),
- "plyer>=2.1.0",
- "lxml>=6.0.0"
+    "thefuzz>=0.22.1",
+    "yt-dlp>=2025.7.21",
+    "pycryptodomex>=3.23.0",
+    "pypiwin32; sys_platform == 'win32'",   # For Windows-specific functionality
+    "pyobjc; sys_platform == 'darwin'",     # For macOS-specific functionality
+    "dbus-python; sys_platform == 'linux'", # For Linux-specific functionality (e.g., notifications),
+    "plyer>=2.1.0",
+    "lxml>=6.0.0",
 ]
 notifications = [
-    "dbus-python>=1.4.0",
+    "pypiwin32; sys_platform == 'win32'",          # For Windows-specific functionality
+    "pyobjc; sys_platform == 'darwin'",            # For macOS-specific functionality
+    "dbus-python>=1.4.0; sys_platform == 'linux'",
     "plyer>=2.1.0",
 ]
-mpv = [
-    "mpv>=1.0.7",
-]
+mpv = ["mpv>=1.0.7"]
 torrent = ["libtorrent>=2.0.11"]
 lxml = ["lxml>=6.0.0"]
 discord = ["pypresence>=4.3.0"]
-download = [
-    "pycryptodomex>=3.23.0",
-    "yt-dlp>=2025.7.21",
-]
-torrents = [
-    "libtorrent>=2.0.11",
-]
+download = ["pycryptodomex>=3.23.0", "yt-dlp>=2025.7.21"]
+torrents = ["libtorrent>=2.0.11"]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.uv]
-dev-dependencies = [
-  "pre-commit>=4.0.1",
-  "pyinstaller>=6.11.1",
-  "pyright>=1.1.384",
-  "pytest>=8.3.3",
-  "pytest-httpx>=0.35.0",
-  "ruff>=0.6.9",
+[dependency-groups]
+dev = [
+    "pre-commit>=4.0.1",
+    "pyinstaller>=6.11.1",
+    "pyright>=1.1.384",
+    "pytest>=8.3.3",
+    "pytest-httpx>=0.35.0",
+    "ruff>=0.6.9",
 ]
 
 [tool.pytest.ini_options]

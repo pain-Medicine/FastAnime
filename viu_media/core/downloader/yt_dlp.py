@@ -11,7 +11,7 @@ from rich.prompt import Confirm
 
 import yt_dlp
 from yt_dlp.utils import sanitize_filename
-
+from ..utils.detect import get_clean_env
 from ..exceptions import ViuError
 from ..patterns import TORRENT_REGEX
 from ..utils.networking import get_remote_filename
@@ -29,6 +29,9 @@ class YtDLPDownloader(BaseDownloader):
             video_path = None
             sub_paths = []
             merged_path = None
+
+            logger.debug(f"Starting download for URL: {params.url}")
+            logger.debug(f"Using Headers: {params.headers}")
 
             if TORRENT_REGEX.match(params.url):
                 from .torrents import download_torrent_with_webtorrent_cli
@@ -91,6 +94,7 @@ class YtDLPDownloader(BaseDownloader):
             else tuple(),
             "progress_hooks": params.progress_hooks,
             "nocheckcertificate": params.no_check_certificate,
+            "logger": params.logger,
         }
         opts = opts
         if params.force_ffmpeg or params.hls_use_mpegts or params.hls_use_h264:
@@ -130,10 +134,11 @@ class YtDLPDownloader(BaseDownloader):
                 }
             )
 
-        with yt_dlp.YoutubeDL(opts) as ydl:
+        # TODO: Confirm this type issues
+        with yt_dlp.YoutubeDL(opts) as ydl:  # type: ignore
             info = ydl.extract_info(params.url, download=True)
             if info:
-                _video_path = info["requested_downloads"][0]["filepath"]
+                _video_path = info["requested_downloads"][0]["filepath"]  # type: ignore
                 if _video_path.endswith(".unknown_video"):
                     print("Normalizing path...")
                     _vid_path = _video_path.replace(".unknown_video", ".mp4")
@@ -219,7 +224,7 @@ class YtDLPDownloader(BaseDownloader):
 
             # Run the ffmpeg command
             try:
-                subprocess.run(args)
+                subprocess.run(args, env=get_clean_env())
                 final_output_path = video_path.parent / merged_filename
 
                 if final_output_path.exists():

@@ -1,4 +1,5 @@
 import logging
+import shutil
 import sys
 from typing import TYPE_CHECKING
 
@@ -109,12 +110,103 @@ def cli(ctx: click.Context, **options: "Unpack[Options]"):
     )
     ctx.obj = config
 
+    if config.general.welcome_screen:
+        import time
+
+        from ..core.constants import APP_CACHE_DIR, USER_NAME, SUPPORT_PROJECT_URL
+
+        last_welcomed_at_file = APP_CACHE_DIR / ".last_welcome"
+        should_welcome = False
+        if last_welcomed_at_file.exists():
+            try:
+                last_welcomed_at = float(
+                    last_welcomed_at_file.read_text(encoding="utf-8")
+                )
+                # runs once a month
+                if (time.time() - last_welcomed_at) > 30 * 24 * 3600:
+                    should_welcome = True
+
+            except Exception as e:
+                logger.warning(f"Failed to read welcome screen timestamp: {e}")
+
+        else:
+            should_welcome = True
+        if should_welcome:
+            last_welcomed_at_file.write_text(str(time.time()), encoding="utf-8")
+
+            from rich.prompt import Confirm
+
+            if Confirm.ask(f"""\
+[green]How are you, {USER_NAME} 🙂?
+If you enjoy the project and would like to support it, you can buy me a coffee at {SUPPORT_PROJECT_URL}.
+Would you like to open the support page? Select yes to continue — otherwise, enjoy your terminal-anime browsing experience 😁.[/]
+You can disable this message by turning off the welcome_screen option in the config. It only appears once a month.
+"""):
+                from webbrowser import open
+
+                open(SUPPORT_PROJECT_URL)
+
+    if config.general.show_new_release:
+        import time
+
+        from ..core.constants import APP_CACHE_DIR
+
+        last_release_file = APP_CACHE_DIR / ".last_release"
+        should_print_release_notes = False
+        if last_release_file.exists():
+            last_release = last_release_file.read_text(encoding="utf-8")
+            current_version = list(map(int, __version__.replace("v", "").split(".")))
+            last_saved_version = list(
+                map(int, last_release.replace("v", "").split("."))
+            )
+            if (
+                (current_version[0] > last_saved_version[0])
+                or (
+                    current_version[1] > last_saved_version[1]
+                    and current_version[0] == last_saved_version[0]
+                )
+                or (
+                    current_version[2] > last_saved_version[2]
+                    and current_version[0] == last_saved_version[0]
+                    and current_version[1] == last_saved_version[1]
+                )
+            ):
+                should_print_release_notes = True
+
+        else:
+            should_print_release_notes = True
+        if should_print_release_notes:
+            last_release_file.write_text(__version__, encoding="utf-8")
+            from .service.feedback import FeedbackService
+            from .utils.update import check_for_updates, print_release_json, update_app
+            from rich.prompt import Confirm
+
+            feedback = FeedbackService(config)
+            feedback.info("Getting release notes...")
+            is_latest, release_json = check_for_updates()
+            if Confirm.ask(
+                "Would you also like to update your config with the latest options and config notes"
+            ):
+                import subprocess
+
+                _cli_cmd_name = "viu" if not shutil.which("viu-media") else "viu-media"
+                cmd = [_cli_cmd_name, "config", "--update"]
+                print(f"running '{' '.join(cmd)}'...")
+                subprocess.run(cmd)
+
+            if is_latest:
+                print_release_json(release_json)
+            else:
+                print_release_json(release_json)
+                print("It seems theres another update waiting for you as well 😁")
+            click.pause("Press Any Key To Proceed...")
+
     if config.general.check_for_updates:
         import time
 
         from ..core.constants import APP_CACHE_DIR
 
-        last_updated_at_file = APP_CACHE_DIR / "last_update"
+        last_updated_at_file = APP_CACHE_DIR / ".last_update"
         should_check_for_update = False
         if last_updated_at_file.exists():
             try:

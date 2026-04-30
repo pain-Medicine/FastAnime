@@ -1,4 +1,4 @@
-from typing import Any
+import logging
 
 from ..types import (
     Anime,
@@ -21,6 +21,8 @@ translation_type_map = {
     "dub": MediaTranslationType.DUB,
     "raw": MediaTranslationType.RAW,
 }
+
+logger = logging.getLogger(__name__)
 
 
 def map_to_search_results(data: AnimePaheSearchPage) -> SearchResults:
@@ -87,13 +89,25 @@ def map_to_anime_result(
 
 
 def map_to_server(
-    episode: AnimeEpisodeInfo, translation_type: Any, quality: Any, stream_link: Any
+    episode: AnimeEpisodeInfo,
+    translation_type: str,
+    stream_links: list[tuple[str, str]],
+    headers: dict[str, str],
 ) -> Server:
     links = [
         EpisodeStream(
-            link=stream_link,
-            quality=quality,
+            link=link[1],
+            quality=link[0] if link[0] in ["360", "480", "720", "1080"] else "1080",  # type:ignore
             translation_type=translation_type_map[translation_type],
         )
+        for link in stream_links
     ]
-    return Server(name="kwik", links=links, episode_title=episode.title)
+
+    # sort links by quality, best to worst
+    links.sort(key=lambda x: int(x.quality), reverse=True)
+    logger.debug(f"Aggregated links: {links}")
+
+    return Server(
+        name="kwik", links=links, episode_title=episode.title, headers=headers
+    )
+

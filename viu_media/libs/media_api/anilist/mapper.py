@@ -33,6 +33,7 @@ from ..types import (
     Studio,
     UserListItem,
     UserMediaListStatus,
+    MediaType,
     UserProfile,
 )
 from .types import (
@@ -322,7 +323,14 @@ def to_generic_user_list_result(data: AnilistMediaLists) -> Optional[MediaSearch
 def to_generic_user_profile(data: AnilistViewerData) -> Optional[UserProfile]:
     """Maps a raw AniList viewer response to a generic UserProfile."""
 
-    viewer_data: Optional[AnilistCurrentlyLoggedInUser] = data["data"]["Viewer"]
+    data_node = data.get("data")
+    if not data_node:
+        return None
+
+    viewer_data: Optional[AnilistCurrentlyLoggedInUser] = data_node.get("Viewer")
+
+    if not viewer_data:
+        return None
 
     return UserProfile(
         id=viewer_data["id"],
@@ -539,7 +547,7 @@ def _to_generic_media_item_from_notification_partial(
         title=_to_generic_media_title(data["title"]),
         cover_image=_to_generic_media_image(data["coverImage"]),
         # Provide default/empty values for fields not in notification payload
-        type="ANIME",
+        type=MediaType.ANIME,
         status=MediaStatus.RELEASING,  # Assume releasing for airing notifications
         format=None,
         description=None,

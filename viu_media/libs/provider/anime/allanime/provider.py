@@ -7,6 +7,7 @@ from ..utils.debug import debug_provider
 from .constants import (
     ANIME_GQL,
     API_GRAPHQL_ENDPOINT,
+    API_GRAPHQL_HEADERS,
     API_GRAPHQL_REFERER,
     EPISODE_GQL,
     EPISODE_GQL_HASH,
@@ -51,6 +52,7 @@ class AllAnime(BaseAnimeProvider):
                 "translationtype": params.translation_type,
                 "countryorigin": params.country_of_origin,
             },
+            headers=API_GRAPHQL_HEADERS
         )
         return map_to_search_results(response)
 
@@ -61,6 +63,7 @@ class AllAnime(BaseAnimeProvider):
             self.curl_client,
             ANIME_GQL,
             variables={"showId": params.id},
+            headers=API_GRAPHQL_HEADERS
         )
         return map_to_anime_result(response)
 
@@ -89,6 +92,7 @@ class AllAnime(BaseAnimeProvider):
                 "variables": json.dumps(variables),
                 "extensions": json.dumps(extensions),
             },
+            headers=API_GRAPHQL_HEADERS
         )
         
         # If GET fails or returns captcha error, fall back to POST (original behavior)

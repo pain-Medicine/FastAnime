@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 
 import click
 
+
 from ...core.config import AppConfig
 from ...core.exceptions import ViuError
 from ..utils.completion import anime_titles_shell_complete
@@ -30,7 +31,6 @@ if TYPE_CHECKING:
 @click.option(
     "--anime-title",
     "-t",
-    required=True,
     shell_complete=anime_titles_shell_complete,
     multiple=True,
     help="Specify which anime to download",
@@ -50,7 +50,12 @@ def search(config: AppConfig, **options: "Unpack[Options]"):
         SearchParams,
     )
     from ...libs.provider.anime.provider import create_provider
+    from viu_media.core.utils.normalizer import normalize_title
     from ...libs.selectors.selector import create_selector
+
+    if not options["anime_title"]:
+        raw = click.prompt("What are you in the mood for? (comma-separated)")
+        options["anime_title"] = [a.strip() for a in raw.split(",") if a.strip()]
 
     feedback = FeedbackService(config)
     provider = create_provider(config.general.provider)
@@ -64,7 +69,10 @@ def search(config: AppConfig, **options: "Unpack[Options]"):
         with feedback.progress(f"Fetching anime search results for {anime_title}"):
             search_results = provider.search(
                 SearchParams(
-                    query=anime_title, translation_type=config.stream.translation_type
+                    query=normalize_title(
+                        anime_title, config.general.provider.value, True
+                    ).lower(),
+                    translation_type=config.stream.translation_type,
                 )
             )
         if not search_results:
@@ -173,6 +181,22 @@ def stream_anime(
             if not server_name:
                 raise ViuError("Server not selected")
             server = servers[server_name]
+    quality = [
+        ep_stream.link
+        for ep_stream in server.links
+        if ep_stream.quality == config.stream.quality
+    ]
+    if not quality:
+        feedback.warning("Preferred quality not found, selecting quality...")
+        stream_link = selector.choose(
+            "Select Quality", [link.quality for link in server.links]
+        )
+        if not stream_link:
+            raise ViuError("Quality not selected")
+        stream_link = next(
+            (link.link for link in server.links if link.quality == stream_link), None
+        )
+
     stream_link = server.links[0].link
     if not stream_link:
         raise ViuError(

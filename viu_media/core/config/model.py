@@ -156,6 +156,9 @@ class GeneralConfig(BaseModel):
         default=defaults.GENERAL_API_CLIENT,
         description=desc.GENERAL_API_CLIENT,
     )
+    welcome_screen: bool = Field(
+        default=defaults.GENERAL_WELCOME_SCREEN, description=desc.GENERAL_WELCOME_SCREEN
+    )
     provider: ProviderName = Field(
         default=ProviderName.ALLANIME,
         description=desc.GENERAL_PROVIDER,
@@ -178,7 +181,9 @@ class GeneralConfig(BaseModel):
         description=desc.GENERAL_SCALE_PREVIEW,
     )
 
-    image_renderer: Literal["icat", "chafa", "imgcat"] = Field(
+    image_renderer: Literal[
+        "icat", "chafa", "imgcat", "system-sixels", "system-kitty", "system-default"
+    ] = Field(
         default_factory=defaults.GENERAL_IMAGE_RENDERER,
         description=desc.GENERAL_IMAGE_RENDERER,
     )
@@ -189,6 +194,10 @@ class GeneralConfig(BaseModel):
     check_for_updates: bool = Field(
         default=defaults.GENERAL_CHECK_FOR_UPDATES,
         description=desc.GENERAL_CHECK_FOR_UPDATES,
+    )
+    show_new_release: bool = Field(
+        default=defaults.GENERAL_SHOW_NEW_RELEASE,
+        description=desc.GENERAL_SHOW_NEW_RELEASE,
     )
     update_check_interval: float = Field(
         default=defaults.GENERAL_UPDATE_CHECK_INTERVAL,
@@ -525,6 +534,7 @@ class AppConfig(BaseModel):
         description=desc.APP_ROFI,
     )
     mpv: MpvConfig = Field(default_factory=MpvConfig, description=desc.APP_MPV)
+    vlc: VlcConfig = Field(default_factory=VlcConfig, description=desc.APP_VLC)
     media_registry: MediaRegistryConfig = Field(
         default_factory=MediaRegistryConfig, description=desc.APP_MEDIA_REGISTRY
     )

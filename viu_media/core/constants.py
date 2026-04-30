@@ -9,11 +9,12 @@ CLI_NAME_LOWER = "viu"
 PROJECT_NAME = "viu-media"
 APP_NAME = os.environ.get(f"{CLI_NAME}_APP_NAME", CLI_NAME_LOWER)
 
-USER_NAME = os.environ.get("USERNAME", "User")
+USER_NAME = os.environ.get("USERNAME", os.environ.get("USER", "User"))
+
 
 __version__ = metadata.version("viu_media")
 
-AUTHOR = "Benexl"
+AUTHOR = "viu-media"
 GIT_REPO = "github.com"
 GIT_PROTOCOL = "https://"
 REPO_HOME = f"https://{GIT_REPO}/{AUTHOR}/Viu"
@@ -25,7 +26,7 @@ ANILIST_AUTH = (
 )
 
 try:
-    APP_DIR = Path(str(resources.files(CLI_NAME.lower())))
+    APP_DIR = Path(str(resources.files(PROJECT_NAME.lower())))
 
 except ModuleNotFoundError:
     from pathlib import Path
@@ -85,3 +86,4 @@ USER_VIDEOS_DIR.mkdir(parents=True, exist_ok=True)
 USER_CONFIG = APP_DATA_DIR / "config.toml"
 
 LOG_FILE = LOG_FOLDER / "app.log"
+SUPPORT_PROJECT_URL = "https://buymeacoffee.com/benexl"

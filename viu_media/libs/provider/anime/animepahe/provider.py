@@ -1,6 +1,7 @@
 import logging
 from functools import lru_cache
 from typing import Iterator, Optional
+from urllib.parse import urlparse
 
 from ..base import BaseAnimeProvider
 from ..params import AnimeParams, EpisodeStreamsParams, SearchParams
@@ -9,9 +10,11 @@ from ..utils.debug import debug_provider
 from .constants import (
     ANIMEPAHE_BASE,
     ANIMEPAHE_ENDPOINT,
+    CDN_PROVIDER,
     JUICY_STREAM_REGEX,
     REQUEST_HEADERS,
     SERVER_HEADERS,
+    STREAM_HEADERS,
 )
 from .extractor import process_animepahe_embed_page
 from .mappers import map_to_anime_result, map_to_search_results, map_to_server
@@ -131,15 +134,18 @@ class AnimePahe(BaseAnimeProvider):
         res_dicts = [extract_attributes(item) for item in resolutionMenuItems]
         quality = None
         translation_type = None
-        stream_link = None
+        stream_links = []
+        stream_host = None
 
         # TODO: better document the scraping process
         for res_dict in res_dicts:
             # the actual attributes are data attributes in the original html 'prefixed with data-'
             embed_url = res_dict["src"]
+            logger.debug(f"Found embed url: {embed_url}")
             data_audio = "dub" if res_dict["audio"] == "eng" else "sub"
 
             if data_audio != params.translation_type:
+                logger.debug(f"Found {data_audio} but wanted {params.translation_type}")
                 continue
 
             if not embed_url:
@@ -155,22 +161,34 @@ class AnimePahe(BaseAnimeProvider):
             )
             embed_response.raise_for_status()
             embed_page = embed_response.text
+            logger.debug("Processing embed page for JS decoding")
 
             decoded_js = process_animepahe_embed_page(embed_page)
             if not decoded_js:
                 logger.error("failed to decode embed page")
                 continue
+            logger.debug(f"Decoded JS: {decoded_js[:100]}...")
             juicy_stream = JUICY_STREAM_REGEX.search(decoded_js)
             if not juicy_stream:
                 logger.error("failed to find juicy stream")
                 continue
+            logger.debug(f"Found juicy stream: {juicy_stream.group(1)}")
             juicy_stream = juicy_stream.group(1)
+            stream_host = urlparse(juicy_stream).hostname
             quality = res_dict["resolution"]
+            logger.debug(f"Found quality: {quality}")
             translation_type = data_audio
-            stream_link = juicy_stream
+            stream_links.append((quality, juicy_stream))
 
-        if translation_type and quality and stream_link:
-            yield map_to_server(episode, translation_type, quality, stream_link)
+        if translation_type and stream_links:
+            headers = {
+                "User-Agent": self.client.headers["User-Agent"],
+                "Host": stream_host or CDN_PROVIDER,
+                **STREAM_HEADERS,
+            }
+            yield map_to_server(
+                episode, translation_type, stream_links, headers=headers
+            )
 
     @lru_cache()
     def _get_episode_info(self, params: EpisodeStreamsParams) -> Optional[AnimeEpisodeInfo]:
