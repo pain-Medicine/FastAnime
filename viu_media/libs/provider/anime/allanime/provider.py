@@ -102,7 +102,7 @@ class AllAnime(BaseAnimeProvider):
             source_urls = episode.get("sourceUrls", [])
 
         for source in source_urls:
-            if server := extract_server(self.client, params.episode, episode, source):
+            if server := extract_server(self.curl_client, params.episode, episode, source):
                 yield server
 
 
