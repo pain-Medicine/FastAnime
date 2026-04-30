@@ -28,5 +28,6 @@ class VidMp4Extractor(BaseExtractor):
                 EpisodeStream(link=link, quality="1080") for link in streams["links"]
             ],
             episode_title=episode["notes"],
-            headers={"Referer": f"{API_GRAPHQL_REFERER}"},
+            headers={"Referer": referer} if referer else {},
+            
         )

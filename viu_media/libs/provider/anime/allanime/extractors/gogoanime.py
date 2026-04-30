@@ -20,6 +20,7 @@ class Lufmp4Extractor(BaseExtractor):
         )
         response.raise_for_status()
         streams: AllAnimeEpisodeStreams = response.json()
+        referer = response.json().get("Referer")
 
         return Server(
             name="gogoanime",
@@ -30,5 +31,6 @@ class Lufmp4Extractor(BaseExtractor):
                 for stream in streams["links"]
             ],
             episode_title=episode["notes"],
-            headers={"Referer": f"{API_GRAPHQL_REFERER}"},
+            headers={"Referer": referer} if referer else {},
+            
         )

@@ -22,7 +22,10 @@ logger = logging.getLogger(__name__)
 
 
 class AllAnime(BaseAnimeProvider):
-    HEADERS = {"Referer": API_GRAPHQL_REFERER}
+    HEADERS = {
+        "Referer": API_GRAPHQL_REFERER,
+        "Origin": "https://youtu-chan.com",
+    }
 
     def __init__(self, client):
         super().__init__(client)

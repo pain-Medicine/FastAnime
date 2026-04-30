@@ -18,5 +18,5 @@ class YtExtractor(BaseExtractor):
             name="Yt",
             links=[EpisodeStream(link=url, quality="1080")],
             episode_title=episode["notes"],
-            headers={"Referer": f"{API_GRAPHQL_REFERER}"},
+            headers={"Referer": "https://youtu-chan.com"},
         )

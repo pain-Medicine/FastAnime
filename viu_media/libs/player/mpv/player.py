@@ -142,26 +142,15 @@ class MpvPlayer(BasePlayer):
 
         proc = subprocess.run(
             pre_args + mpv_args,
-            capture_output=True,
+            capture_output=False,
             text=True,
             encoding="utf-8",
             check=False,
         )
         if proc.returncode != 0:
             logger.error(f"MPV exited with code {proc.returncode}")
-            logger.error(f"MPV stdout: {proc.stdout}")
-            logger.error(f"MPV stderr: {proc.stderr}")
             
-        if proc.stdout:
-            for line in reversed(proc.stdout.split("\n")):
-                match = MPV_AV_TIME_PATTERN.search(line.strip())
-                if match:
-                    stop_time = match.group(1)
-                    total_time = match.group(2)
-                    break
-        return PlayerResult(
-            episode=params.episode, total_time=total_time, stop_time=stop_time
-        )
+        return PlayerResult(episode=params.episode, total_time=None, stop_time=None)
 
     def play_with_ipc(self, params: PlayerParams, socket_path: str) -> subprocess.Popen:
         """

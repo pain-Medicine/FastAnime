@@ -13,6 +13,7 @@ class DefaultExtractor(BaseExtractor):
         )
         response.raise_for_status()
         streams: AllAnimeEpisodeStreams = response.json()
+        referer = response.json().get("Referer")
         return Server(
             name="wixmp",
             links=[
@@ -22,5 +23,5 @@ class DefaultExtractor(BaseExtractor):
                 for stream in streams["links"]
             ],
             episode_title=episode["notes"],
-            headers={"Referer": f"{API_GRAPHQL_REFERER}"},
+            headers={"Referer": referer} if referer else {},
         )
