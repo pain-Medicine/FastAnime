@@ -3,6 +3,13 @@ import logging
 import os
 import re
 from itertools import cycle
+import base64
+import hashlib
+import json
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+
+from .constants import AES_KEY_PASSPHRASE
 
 logger = logging.getLogger(__name__)
 
@@ -89,3 +96,36 @@ def decode_hex_string(hex_string):
     decoded_chars = [hex_to_char.get(pair.lower(), pair) for pair in hex_pairs]
 
     return "".join(decoded_chars)
+
+
+def decrypt_tobeparsed(blob: str) -> list[dict]:
+    """
+    Decrypts the AES-256-GCM encrypted episode sourceUrls.
+    AllAnime uses a custom AES encryption with a key derived from SHA-256.
+    """
+    try:
+        data = base64.b64decode(blob)
+        
+        # Extract IV (skip 1 byte, then take 12 bytes)
+        iv = data[1:13]
+        
+        # Extract ciphertext (skip first 13 bytes, ignore last 16 bytes for GCM tag)
+        ciphertext = data[13:-16]
+        
+        # Derive AES key using SHA-256
+        key = hashlib.sha256(AES_KEY_PASSPHRASE.encode('utf-8')).digest()
+        
+        # Build CTR mode counter (IV + 00000002)
+        counter = iv + b'\x00\x00\x00\x02'
+        
+        # Decrypt using AES-256-CTR
+        cipher = Cipher(algorithms.AES(key), modes.CTR(counter), backend=default_backend())
+        decryptor = cipher.decryptor()
+        plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+        
+        # Parse the JSON
+        decoded = plaintext.decode('utf-8')
+        return json.loads(decoded)
+    except Exception as e:
+        logger.error(f"Failed to decrypt/parse tobeparsed: {e}")
+        return []

@@ -1,7 +1,7 @@
 import logging
 from typing import TYPE_CHECKING
 
-from .....core.utils.graphql import execute_graphql_query_with_get_request
+from .....core.utils.graphql import execute_graphql
 from ..base import BaseAnimeProvider
 from ..utils.debug import debug_provider
 from .constants import (
@@ -26,7 +26,7 @@ class AllAnime(BaseAnimeProvider):
 
     @debug_provider
     def search(self, params):
-        response = execute_graphql_query_with_get_request(
+        response = execute_graphql(
             API_GRAPHQL_ENDPOINT,
             self.client,
             SEARCH_GQL,
@@ -46,7 +46,7 @@ class AllAnime(BaseAnimeProvider):
 
     @debug_provider
     def get(self, params):
-        response = execute_graphql_query_with_get_request(
+        response = execute_graphql(
             API_GRAPHQL_ENDPOINT,
             self.client,
             ANIME_GQL,
@@ -57,8 +57,9 @@ class AllAnime(BaseAnimeProvider):
     @debug_provider
     def episode_streams(self, params):
         from .extractors import extract_server
+        from .utils import decrypt_tobeparsed
 
-        episode_response = execute_graphql_query_with_get_request(
+        episode_response = execute_graphql(
             API_GRAPHQL_ENDPOINT,
             self.client,
             EPISODE_GQL,
@@ -68,8 +69,23 @@ class AllAnime(BaseAnimeProvider):
                 "episodeString": params.episode,
             },
         )
-        episode: AllAnimeEpisode = episode_response.json()["data"]["episode"]
-        for source in episode["sourceUrls"]:
+        try:
+            print("GraphQL Response text:", episode_response.text)
+            episode = episode_response.json()["data"]["episode"]
+        except KeyError:
+            print("GraphQL Error response:", episode_response.text)
+            raise
+        
+        if not episode:
+            logger.error(f"Failed to fetch episode: {episode_response.text}")
+            return
+
+        if "tobeparsed" in episode:
+            source_urls = decrypt_tobeparsed(episode["tobeparsed"])
+        else:
+            source_urls = episode.get("sourceUrls", [])
+
+        for source in source_urls:
             if server := extract_server(self.client, params.episode, episode, source):
                 yield server
 
