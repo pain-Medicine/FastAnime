@@ -247,9 +247,15 @@ class MpvPlayer(BasePlayer):
             list[str]: List of MPV CLI arguments.
         """
         mpv_args = []
+        
+        # Ensure a valid browser User-Agent is always used to prevent Cloudflare blocks
+        user_agent = params.headers.get("User-Agent") or "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        mpv_args.append(f"--user-agent={user_agent}")
+
         if params.headers:
-            header_str = ",".join([f"{k}:{v}" for k, v in params.headers.items()])
-            mpv_args.append(f"--http-header-fields={header_str}")
+            header_str = ",".join([f"{k}:{v}" for k, v in params.headers.items() if k.lower() != "user-agent"])
+            if header_str:
+                mpv_args.append(f"--http-header-fields={header_str}")
 
         if params.subtitles:
             for sub in params.subtitles:
