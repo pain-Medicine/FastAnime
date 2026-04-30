@@ -86,8 +86,8 @@ For the best experience, please install these external tools:
 The best way to install Viu is with [**uv**](https://github.com/astral-sh/uv), a lightning-fast Python package manager.
 
 ```bash
-# Clone the repository and from the base directory run: 
 # Install with all optional features for the full experience
+# Clone the repository and from the base directory run: 
 uv tool install .
 
 # Or, if you are already have VIU installed:
