@@ -89,7 +89,7 @@ The best way to install Viu is with [**uv**](https://github.com/astral-sh/uv), a
   
   Requires [Git](https://git-scm.com/), [Python 3.10+](https://www.python.org/), and [uv](https://astral.sh/blog/uv).
   ```bash
-  git clone https://github.com/viu-media/Viu.git --depth 1
+  git clone https://github.com/pain-Medicine/viu.git --depth 1
   cd Viu
   uv tool install .
   viu --version
