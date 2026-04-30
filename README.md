@@ -86,14 +86,12 @@ For the best experience, please install these external tools:
 The best way to install Viu is with [**uv**](https://github.com/astral-sh/uv), a lightning-fast Python package manager.
 
 ```bash
+Clone the repository and from the base directory run: 
 # Install with all optional features for the full experience
-uv tool install "viu-media[standard]"
+uv tool install .
 
-# Or, pick and choose the extras you need:
-uv tool install viu-media  # Core functionality only
-uv tool install "viu-media[download]"  # For advanced downloading with yt-dlp
-uv tool install "viu-media[discord]"   # For Discord Rich Presence
-uv tool install "viu-media[notifications]" # For desktop notifications
+# Or, if you are already have VIU installed:
+uv tool install . --reinstall
 ```
 
 ### Other Installation Methods
