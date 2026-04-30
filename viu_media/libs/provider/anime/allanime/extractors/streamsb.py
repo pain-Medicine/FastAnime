@@ -1,5 +1,5 @@
 from ...types import EpisodeStream, Server
-from ..constants import API_BASE_URL
+from ..constants import API_BASE_URL, API_GRAPHQL_REFERER
 from ..types import AllAnimeEpisode, AllAnimeSource
 from .base import BaseExtractor
 
@@ -28,5 +28,5 @@ class SsHlsExtractor(BaseExtractor):
                 EpisodeStream(link=link, quality="1080") for link in streams["links"]
             ],
             episode_title=episode["notes"],
-            headers={"Referer": f"https://{API_BASE_URL}/"},
+            headers={"Referer": f"{API_GRAPHQL_REFERER}"},
         )
