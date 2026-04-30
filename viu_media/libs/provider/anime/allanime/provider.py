@@ -9,6 +9,7 @@ from .constants import (
     API_GRAPHQL_ENDPOINT,
     API_GRAPHQL_REFERER,
     EPISODE_GQL,
+    EPISODE_GQL_HASH,
     SEARCH_GQL,
 )
 from .mappers import (
@@ -68,16 +69,38 @@ class AllAnime(BaseAnimeProvider):
         from .extractors import extract_server
         from .utils import decrypt_tobeparsed
 
-        episode_response = execute_graphql(
+        import json
+        extensions = {
+            "persistedQuery": {
+                "version": 1,
+                "sha256Hash": EPISODE_GQL_HASH,
+            }
+        }
+        variables = {
+            "showId": params.anime_id,
+            "translationType": params.translation_type,
+            "episodeString": params.episode,
+        }
+        
+        # Try GET request with persisted query first (bypasses CAPTCHA for many users)
+        episode_response = self.curl_client.get(
             API_GRAPHQL_ENDPOINT,
-            self.curl_client,
-            EPISODE_GQL,
-            variables={
-                "showId": params.anime_id,
-                "translationType": params.translation_type,
-                "episodeString": params.episode,
+            params={
+                "variables": json.dumps(variables),
+                "extensions": json.dumps(extensions),
             },
         )
+        
+        # If GET fails or returns captcha error, fall back to POST (original behavior)
+        if episode_response.status_code != 200 or "NEED_CAPTCHA" in episode_response.text:
+            logger.info("GET persisted query failed or triggered CAPTCHA, falling back to POST")
+            episode_response = execute_graphql(
+                API_GRAPHQL_ENDPOINT,
+                self.curl_client,
+                EPISODE_GQL,
+                variables=variables,
+            )
+
         try:
             data = episode_response.json().get("data", {})
             if "episode" in data and data["episode"]:
