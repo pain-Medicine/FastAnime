@@ -84,7 +84,7 @@ For the best experience, please install these external tools:
 ### Recommended Installation (uv)
 The best way to install Viu is with [**uv**](https://github.com/astral-sh/uv), a lightning-fast Python package manager.
 
-<details>
+<details open>
   <summary><b>Building from Source</b></summary>
   
   Requires [Git](https://git-scm.com/), [Python 3.10+](https://www.python.org/), and [uv](https://astral.sh/blog/uv).
@@ -101,7 +101,7 @@ The best way to install Viu is with [**uv**](https://github.com/astral-sh/uv), a
 
 ### Other Installation Methods - UNTESTED
 
-<details>
+<details closed>
   <summary><b>Platform-Specific and Alternative Installers</b></summary>
   
   #### Nix / NixOS
